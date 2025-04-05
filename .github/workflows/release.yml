@@ -24,17 +24,6 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Create gh-pages branch if not exists
-        run: |
-          if ! git show-ref --quiet refs/heads/gh-pages; then
-            git checkout --orphan gh-pages
-            git rm -rf .
-            echo "Initial commit on gh-pages branch" > README.md
-            git add README.md
-            git commit -m "Initial commit on gh-pages branch"
-            git push origin gh-pages
-          fi
-
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
