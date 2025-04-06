@@ -10,8 +10,8 @@ Database name
 */}}
 {{- define "k3s-server.sanitizeName" -}}
 {{- $namespace := .Release.Namespace -}}
-{{- $fullname := include "k3s-server.fullname" . -}}
-{{- $combined := printf "%s_%s" $namespace $fullname -}}
+{{- $fullname := .Release.Name -}}
+{{- $combined := printf "%s_api_%s" $namespace $fullname -}}
 {{- $sanitized := $combined -}}
 {{- $sanitized = $sanitized | replace "@" "_" | replace "." "_" | replace "-" "_" | replace "_" "_" | replace ":" "_" | replace " " "_" -}}
 {{- $sanitized -}}
