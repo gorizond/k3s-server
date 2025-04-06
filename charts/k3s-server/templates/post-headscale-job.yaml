@@ -63,12 +63,8 @@ spec:
               mountPath: /etc/headscale
         - name: generate-key
           image: headscale/headscale:stable
-          command: ["sh", "-c"]
           args:
-            - |
-              echo "Generating private key..."
-              headscale generate private-key > /tmp/noise_private.key
-              echo "Private key generated."
+            - generate private-key > /tmp/noise_private.key
           volumeMounts:
             - name: config-storage
               mountPath: /etc/headscale
