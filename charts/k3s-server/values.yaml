@@ -13,7 +13,6 @@ postgres:
     password: passw0rd
     hostname: postgres
     port: 5432
-dsn: postgres://postgres:passw0rd@postgres:5432
 token: t0ken
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1

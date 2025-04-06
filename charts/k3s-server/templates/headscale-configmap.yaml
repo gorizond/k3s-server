@@ -5,7 +5,7 @@ metadata:
 data:
   config.yaml: |
     server_url: "http://headscale.{{ $.Values.domain }}"
-    listen_addr: 0.0.0.0:
+    listen_addr: 0.0.0.0:8080
     metrics_listen_addr: 0.0.0.0:9090
     grpc_listen_addr: 0.0.0.0:50443
     grpc_allow_insecure: true
@@ -14,7 +14,6 @@ data:
     prefixes:
       v4: 100.64.0.0/10
       allocation: sequential
-    
     derp:
       server:
         enabled: false
