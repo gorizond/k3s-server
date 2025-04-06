@@ -61,7 +61,6 @@ data:
           {}
       search_domains: []
       extra_records: []
-      use_username_in_magic_dns: false
     unix_socket: /var/run/headscale/headscale.sock
     unix_socket_permission: "0770"
     logtail:

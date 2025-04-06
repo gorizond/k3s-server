@@ -45,7 +45,6 @@ metadata:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-delete-policy": "before-hook-creation"
 spec:
-  ttlSecondsAfterFinished: 0
   template:
     metadata:
       labels:
