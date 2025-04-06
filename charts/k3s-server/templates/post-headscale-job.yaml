@@ -75,6 +75,8 @@ spec:
           volumeMounts:
             - name: tmp-storage
               mountPath: /tmp
+            - name: config-storage
+              mountPath: /etc/headscale
         - name: create-secret
           image: bitnami/kubectl:latest
           command: ["sh", "-c"]
