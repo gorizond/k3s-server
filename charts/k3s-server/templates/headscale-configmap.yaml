@@ -12,7 +12,7 @@ data:
     grpc_listen_addr: 0.0.0.0:50443
     grpc_allow_insecure: true
     noise:
-      private_key_path: /etc/headscale/noise_private.key
+      private_key_path: /etc/headscale_secret/noise_private.key
     prefixes:
       v4: 100.64.0.0/10
       allocation: sequential

@@ -60,10 +60,8 @@ spec:
           volumeMounts:
             - mountPath: /etc/headscale
               name: configs
-              subPath: config.yaml
-            - mountPath: /etc/headscale
+            - mountPath: /etc/headscale_secret
               name: secret
-              subPath: noise_private.key
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
