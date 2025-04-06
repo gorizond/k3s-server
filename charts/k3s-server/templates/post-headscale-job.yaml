@@ -64,7 +64,10 @@ spec:
         - name: generate-key
           image: headscale/headscale:stable
           args:
-            - generate private-key > /tmp/noise_private.key
+            - generate
+            - private-key
+            - '>'
+            - /tmp/noise_private.key
           volumeMounts:
             - name: config-storage
               mountPath: /etc/headscale
