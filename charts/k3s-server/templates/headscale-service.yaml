@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "headscale-{{ include "k3s-server.fullname" . }}"
+  labels:
+    {{- include "k3s-server.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: "headscale-{{ include "k3s-server.fullname" . }}"
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: metrics
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
