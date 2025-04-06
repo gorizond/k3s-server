@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "k3s-server.fullname" . }}-pre-delete"
+  labels:
+    {{- include "k3s-server.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "pre-delete"
+    "helm.sh/hook-delete-policy": "hook-succeeded"
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "k3s-server.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: drop-database
+          image: postgres:alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              export DSN={{ .Values.dsn }}?sslmode=disable
+              psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.fullname" . }};"
+      restartPolicy: Never
