@@ -41,7 +41,7 @@ spec:
             - '--disable-agent'
             - '--node-taint=CriticalAddonsOnly=true:NoExecute'
             - '--https-listen-port={{ $.Values.service.port }}'
-            - '--tls-san={{ $.Values.domain }}'
+            - '--tls-san=api.{{ $.Values.domain }}'
             - '--disable=servicelb'
             - '--disable=traefik'
             - '--disable=local-storage'
@@ -51,7 +51,7 @@ spec:
           {{- end }}
           env:
             - name: K3S_DATASTORE_ENDPOINT
-              value: {{ $.Values.dsn }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
+              value: postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
             - name: K3S_TOKEN
               value: {{ $.Values.token }}
           {{- with .Values.env }}

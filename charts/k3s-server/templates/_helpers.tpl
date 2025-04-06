@@ -6,12 +6,24 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
-Database name
+Database name api
 */}}
 {{- define "k3s-server.sanitizeName" -}}
 {{- $namespace := .Release.Namespace -}}
 {{- $fullname := .Release.Name -}}
 {{- $combined := printf "%s_api_%s" $namespace $fullname -}}
+{{- $sanitized := $combined -}}
+{{- $sanitized = $sanitized | replace "@" "_" | replace "." "_" | replace "-" "_" | replace "_" "_" | replace ":" "_" | replace " " "_" -}}
+{{- $sanitized -}}
+{{- end -}}
+
+{{/*
+Database name headscale
+*/}}
+{{- define "k3s-server.sanitizeNameHeadscale" -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $fullname := .Release.Name -}}
+{{- $combined := printf "%s_hs_%s" $namespace $fullname -}}
 {{- $sanitized := $combined -}}
 {{- $sanitized = $sanitized | replace "@" "_" | replace "." "_" | replace "-" "_" | replace "_" "_" | replace ":" "_" | replace " " "_" -}}
 {{- $sanitized -}}

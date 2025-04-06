@@ -19,7 +19,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              export DSN={{ .Values.dsn }}?sslmode=disable
+              export DSN=postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}?sslmode=disable
               psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.sanitizeName" . }};"
       restartPolicy: Never
       serviceAccount: default

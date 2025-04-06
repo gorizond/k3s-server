@@ -51,31 +51,16 @@ spec:
         {{- include "k3s-server.labels" . | nindent 8 }}
     spec:
       containers:
-        - name: download-config
-          image: alpine:latest
-          command: ["sh", "-c"]
-          args:
-            - |
-              mkdir -p /etc/headscale
-              wget -O /etc/headscale/config.yaml https://raw.githubusercontent.com/juanfont/headscale/main/config-example.yaml
-          volumeMounts:
-            - name: config-storage
-              mountPath: /etc/headscale
         - name: generate-key
           image: headscale/headscale:stable-debug
           command: ["sh", "-c"]
           args:
             - |-
-              until [ -f /etc/headscale/config.yaml ]
-              do
-                  sleep 1
-                  echo 'not exist /etc/headscale/config.yaml'
-              done
               headscale generate private-key > /tmp/noise_private.key
           volumeMounts:
             - name: tmp-storage
               mountPath: /tmp
-            - name: config-storage
+            - name: headscale-configs
               mountPath: /etc/headscale
         - name: create-secret
           image: bitnami/kubectl:latest
@@ -84,15 +69,16 @@ spec:
             - |
               kubectl create -n {{ .Release.Namespace }} secret generic "headscale-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --from-file=config.yaml=/etc/headscale/config.yaml
           volumeMounts:
-            - name: config-storage
+            - name: headscale-configs
               mountPath: /etc/headscale
             - name: tmp-storage
               mountPath: /tmp
       volumes:
-        - name: config-storage
-          emptyDir: {}
         - name: tmp-storage
           emptyDir: {}
+        - name: headscale-configs
+          configMap:
+            name: "headscale-{{ include "k3s-server.fullname" . }}"
       restartPolicy: OnFailure
       serviceAccount: "headscale-{{ include "k3s-server.fullname" . }}"
       serviceAccountName: "headscale-{{ include "k3s-server.fullname" . }}"

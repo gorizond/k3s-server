@@ -10,7 +10,7 @@ metadata:
   {{- end }}
 spec:
   routes:
-    - match: HostSNI(`{{ $.Values.domain }}`)
+    - match: HostSNI(`api.{{ $.Values.domain }}`)
       services:
         - name: {{ include "k3s-server.fullname" $ }}
           port: {{ $.Values.service.port }}
