@@ -67,7 +67,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              kubectl create -n {{ .Release.Namespace }} secret generic "headscale-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --from-file=config.yaml=/etc/headscale/config.yaml
+              kubectl create -n {{ .Release.Namespace }} secret generic "headscale-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --dry-run=client -o yaml | kubectl apply -f -
           volumeMounts:
             - name: headscale-configs
               mountPath: /etc/headscale
@@ -79,6 +79,9 @@ spec:
         - name: headscale-configs
           configMap:
             name: "headscale-{{ include "k3s-server.fullname" . }}"
+        - name: headscale-configs-source
+          secret:
+            secretName: "headscale-{{ include "k3s-server.fullname" . }}"
       restartPolicy: OnFailure
       serviceAccount: "headscale-{{ include "k3s-server.fullname" . }}"
       serviceAccountName: "headscale-{{ include "k3s-server.fullname" . }}"
