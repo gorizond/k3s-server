@@ -12,4 +12,5 @@ spec:
       protocol: TCP
       name: k3s
   selector:
+    app: "{{ include "k3s-server.fullname" . }}"
     {{- include "k3s-server.selectorLabels" . | nindent 4 }}

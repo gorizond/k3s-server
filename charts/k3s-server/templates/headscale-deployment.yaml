@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "k3s-server.fullname" . }}
+  name: "headscale-{{ include "k3s-server.fullname" . }}"
   labels:
-    app: "{{ include "k3s-server.fullname" . }}"
+    app: "headscale-{{ include "k3s-server.fullname" . }}"
     {{- include "k3s-server.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
@@ -11,7 +11,7 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: "{{ include "k3s-server.fullname" . }}"
+      app: "headscale-{{ include "k3s-server.fullname" . }}"
       {{- include "k3s-server.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -20,7 +20,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        app: "{{ include "k3s-server.fullname" . }}"
+        app: "headscale-{{ include "k3s-server.fullname" . }}"
         {{- include "k3s-server.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
@@ -37,57 +37,44 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          command:
-            - k3s
-            - server
           args:
-            - '--disable-agent'
-            - '--node-taint=CriticalAddonsOnly=true:NoExecute'
-            - '--https-listen-port={{ $.Values.service.port }}'
-            - '--tls-san=api.{{ $.Values.domain }}'
-            - '--disable=servicelb'
-            - '--disable=traefik'
-            - '--disable=local-storage'
-            - '--disable=metrics-server'
-          {{- with .Values.args }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          env:
-            - name: K3S_DATASTORE_ENDPOINT
-              value: postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
-            - name: K3S_TOKEN
-              value: {{ $.Values.token }}
+            - 'serve'
           {{- with .Values.env }}
+          env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: headscale/headscale:stable
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: k3s
-              containerPort: {{ .Values.service.port }}
+            - name: http
+              containerPort: 8080
               protocol: TCP
-          {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.readinessProbe }}
-          readinessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
+            - mountPath: /etc/headscale
+              name: configs
+              subPath: config.yaml
+            - mountPath: /etc/headscale
+              name: secret
+              subPath: noise_private.key
+          {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
       volumes:
+        - name: configs
+          configMap:
+            name: "headscale-{{ include "k3s-server.fullname" . }}"
+        - name: secret
+          secret:
+            secretName: "headscale-{{ include "k3s-server.fullname" . }}"
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
