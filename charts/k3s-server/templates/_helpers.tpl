@@ -12,7 +12,8 @@ Database name
 {{- $namespace := .Release.Namespace -}}
 {{- $fullname := include "k3s-server.fullname" . -}}
 {{- $combined := printf "%s_%s" $namespace $fullname -}}
-{{- $sanitized := $combined | replaceAll "[^a-zA-Z0-9]" "_" -}}
+{{- $sanitized := $combined -}}
+{{- $sanitized = $sanitized | replace "@" "_" | replace "." "_" | replace "-" "_" | replace "_" "_" | replace ":" "_" | replace " " "_" -}}
 {{- $sanitized -}}
 {{- end -}}
 
