@@ -51,7 +51,7 @@ spec:
           {{- end }}
           env:
             - name: K3S_DATASTORE_ENDPOINT
-              value: {{ $.Values.dsn }}/{{ include "k3s-server.fullname" . }}?sslmode=disable
+              value: {{ $.Values.dsn }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
             - name: K3S_TOKEN
               value: {{ $.Values.token }}
           {{- with .Values.env }}

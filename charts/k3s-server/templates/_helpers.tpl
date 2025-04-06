@@ -6,6 +6,17 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+Database name
+*/}}
+{{- define "k3s-server.sanitizeName" -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $fullname := include "k3s-server.fullname" . -}}
+{{- $combined := printf "%s_%s" $namespace $fullname -}}
+{{- $sanitized := $combined | replaceAll "[^a-zA-Z0-9]" "_" -}}
+{{- $sanitized -}}
+{{- end -}}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.

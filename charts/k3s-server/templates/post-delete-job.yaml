@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include \"k3s-server.fullname\" . }}-delete-db"
+  name: "{{ include "k3s-server.fullname" . }}-delete-db"
   labels:
     {{- include "k3s-server.labels" . | nindent 4 }}
   annotations:
@@ -20,7 +20,7 @@ spec:
           args:
             - |
               export DSN={{ .Values.dsn }}?sslmode=disable
-              psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.fullname" . }};"
+              psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.sanitizeName" . }};"
       restartPolicy: Never
       serviceAccount: default
       serviceAccountName: default
