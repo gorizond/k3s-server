@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ include "k3s-server.fullname" . }}-delete-db"
+  name: "{{ include \"k3s-server.fullname\" . }}-delete-db"
   labels:
     {{- include "k3s-server.labels" . | nindent 4 }}
   annotations:
-    "helm.sh/hook": "pre-delete"
+    "helm.sh/hook": "post-delete"
     "helm.sh/hook-delete-policy": "hook-succeeded"
 spec:
   template:
@@ -22,3 +22,5 @@ spec:
               export DSN={{ .Values.dsn }}?sslmode=disable
               psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.fullname" . }};"
       restartPolicy: Never
+      serviceAccount: default
+      serviceAccountName: default
