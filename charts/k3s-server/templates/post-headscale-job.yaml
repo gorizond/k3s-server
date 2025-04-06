@@ -62,10 +62,16 @@ spec:
             - name: config-storage
               mountPath: /etc/headscale
         - name: generate-key
-          image: headscale/headscale:stable
+          image: headscale/headscale:stable-debug
+          command: ["sh", "-c"]
           args:
-            - generate 
-            - private-key > /tmp/noise_private.key
+            - |-
+              until [ -f /etc/headscale/config.yaml ]
+              do
+                  sleep 1
+                  echo 'not exist /etc/headscale/config.yaml'
+              done
+              headscale generate private-key > /tmp/noise_private.key
           volumeMounts:
             - name: tmp-storage
               mountPath: /tmp
