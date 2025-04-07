@@ -64,7 +64,7 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: k3s
@@ -86,8 +86,32 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
+      initContainers:
+        - name: wait-check-config
+          command: ["sh", "-c"]
+          args:
+            - |-
+              until headscale configtest; do
+                echo "wait 'headscale configtest'"
+                sleep 2
+              done
+          image: headscale/headscale:stable-debug
+          volumeMounts:
+            - mountPath: /etc/headscale
+              name: headscale-configs
+            - mountPath: /etc/headscale_secret
+              name: headscale-secret
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       volumes:
+        - name: headscale-configs
+          configMap:
+            name: "headscale-{{ include "k3s-server.fullname" . }}"
+        - name: headscale-secret
+          secret:
+            secretName: "headscale-{{ include "k3s-server.fullname" . }}"
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
