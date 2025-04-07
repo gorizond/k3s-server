@@ -72,6 +72,7 @@ spec:
             - '--disable=traefik'
             - '--disable=local-storage'
             - '--disable=metrics-server'
+            - '--vpn-auth-file=/var/run/headscale/headscale_auth_file'
           {{- with .Values.args }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -142,12 +143,21 @@ spec:
                 echo "wait 'headscale configtest'"
                 sleep 5
               done
+              headscale serve &
+              until nc -zv 0.0.0.0:8080; do
+                sleep 2
+              done
+              headscale users create myfirstuser || echo true
+              token=`headscale preauthkeys create --user myfirstuser --reusable --expiration 5m`
+              echo -e "name=tailscale,joinKey=$token,controlServerURL=http://headscale.{{ $.Values.domain }}" > /var/run/headscale/headscale_auth_file
           image: headscale/headscale:stable-debug
           volumeMounts:
             - mountPath: /etc/headscale
               name: headscale-configs
             - mountPath: /etc/headscale_secret
               name: headscale-secret
+            - mountPath: /var/run/headscale
+              name: headscale-socket
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
