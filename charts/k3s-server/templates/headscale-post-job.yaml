@@ -79,7 +79,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              export DSN=postgres://{{ $.Values.hs.k3s.username }}:{{ $.Values.hs.k3s.password }}@{{ $.Values.hs.k3s.hostname }}:{{ $.Values.hs.k3s.port }}?sslmode=disable
+              export DSN=postgres://{{ $.Values.postgres.hs.username }}:{{ $.Values.postgres.hs.password }}@{{ $.Values.postgres.hs.hostname }}:{{ $.Values.postgres.hs.port }}?sslmode=disable
               psql $DSN -c "CREATE DATABASE IF EXISTS {{ include "k3s-server.sanitizeNameHeadscale" . }};"
       volumes:
         - name: tmp-storage
