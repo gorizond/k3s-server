@@ -74,6 +74,13 @@ spec:
               mountPath: /etc/headscale
             - name: tmp-storage
               mountPath: /tmp
+        - name: create-database
+          image: postgres:alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              export DSN=postgres://{{ $.Values.hs.k3s.username }}:{{ $.Values.hs.k3s.password }}@{{ $.Values.hs.k3s.hostname }}:{{ $.Values.hs.k3s.port }}?sslmode=disable
+              psql $DSN -c "CREATE DATABASE IF EXISTS {{ include "k3s-server.sanitizeNameHeadscale" . }};"
       volumes:
         - name: tmp-storage
           emptyDir: {}
