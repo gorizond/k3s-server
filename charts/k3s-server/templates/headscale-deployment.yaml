@@ -72,7 +72,7 @@ spec:
             - |-
               until headscale configtest; do
                 echo "wait 'headscale configtest'"
-                sleep 2
+                sleep 5
               done
           image: headscale/headscale:stable-debug
           volumeMounts:

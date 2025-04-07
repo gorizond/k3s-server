@@ -36,6 +36,29 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
+        - args:
+            - tailscaled
+          image: tailscale/tailscale
+          name: tailscaled
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-tun
+            - mountPath: /var/run/tailscale
+              name: tailscale-socket
+            - mountPath: /var/lib/tailscale
+              name: tailscale-data
+            - mountPath: /var/lib
+              name: var-lib
         - name: {{ .Chart.Name }}
           command:
             - k3s
@@ -87,27 +110,20 @@ spec:
           volumeMounts:
             - mountPath: /tailscale-binary
               name: tailscale-binary
+            - mountPath: /var/run/tailscale
+              name: tailscale-socket
+            - mountPath: /var/lib/tailscale
+              name: tailscale-data
+            - mountPath: /var/run/headscale
+              name: headscale-socket
+            - mountPath: /dev/net/tun
+              name: dev-tun
+            - mountPath: /var/lib
+              name: var-lib
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
       initContainers:
-        - name: wait-check-config
-          command: ["sh", "-c"]
-          args:
-            - |-
-              until headscale configtest; do
-                echo "wait 'headscale configtest'"
-                sleep 2
-              done
-          image: headscale/headscale:stable-debug
-          volumeMounts:
-            - mountPath: /etc/headscale
-              name: headscale-configs
-            - mountPath: /etc/headscale_secret
-              name: headscale-secret
-          {{- with .Values.volumeMounts }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
         - args:
             - '-c'
             - cp /usr/local/bin/tailscale /tailscale-binary/tailscale
@@ -118,6 +134,23 @@ spec:
           volumeMounts:
             - mountPath: /tailscale-binary
               name: tailscale-binary
+        - name: wait-check-config
+          command: ["sh", "-c"]
+          args:
+            - |-
+              until headscale configtest; do
+                echo "wait 'headscale configtest'"
+                sleep 5
+              done
+          image: headscale/headscale:stable-debug
+          volumeMounts:
+            - mountPath: /etc/headscale
+              name: headscale-configs
+            - mountPath: /etc/headscale_secret
+              name: headscale-secret
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       volumes:
         - emptyDir: {}
           name: tailscale-binary
@@ -127,6 +160,20 @@ spec:
         - name: headscale-secret
           secret:
             secretName: "headscale-{{ include "k3s-server.fullname" . }}"
+        - hostPath:
+            path: /dev/net/tun
+            type: CharDevice
+          name: dev-tun
+        - emptyDir: {}
+          name: tailscale-binary
+        - emptyDir: {}
+          name: tailscale-socket
+        - emptyDir: {}
+          name: tailscale-data
+        - emptyDir: {}
+          name: headscale-socket
+        - emptyDir: {}
+          name: var-lib
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
