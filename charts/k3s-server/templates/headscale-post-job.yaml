@@ -45,6 +45,7 @@ metadata:
     "helm.sh/hook": "post-install"
     "helm.sh/hook-delete-policy": "before-hook-creation"
 spec:
+  ttlSecondsAfterFinished: 0
   template:
     metadata:
       labels:
@@ -67,7 +68,8 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              kubectl patch -n {{ .Release.Namespace }} secret "headscale-{{ include "k3s-server.fullname" . }}" --type='json' -p="[{\"op\": \"replace\", \"path\": \"/data/noise_private.key\", \"value\": \"$(base64 /tmp/noise_private.key)\"}]"
+              kubectl create -n {{ .Release.Namespace }} secret generic "headscale-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --dry-run=client -o yaml | kubectl apply -f -
+          volumeMounts:
             - name: headscale-configs
               mountPath: /etc/headscale
             - name: tmp-storage
