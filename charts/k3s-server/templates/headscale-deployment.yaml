@@ -89,7 +89,7 @@ spec:
             name: "headscale-{{ include "k3s-server.fullname" . }}"
         - name: secret
           secret:
-            secretName: "headscale-{{ include "k3s-server.fullname" . }}"
+            secretName: "headscale-noise-private-{{ include "k3s-server.fullname" . }}"
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}

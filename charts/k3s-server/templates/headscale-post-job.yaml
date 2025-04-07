@@ -63,12 +63,12 @@ spec:
               mountPath: /tmp
             - name: headscale-configs
               mountPath: /etc/headscale
-        - name: create-secret
+        - name: create-secret-noise-private
           image: bitnami/kubectl:latest
           command: ["sh", "-c"]
           args:
             - |
-              kubectl create -n {{ .Release.Namespace }} secret generic "headscale-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --dry-run=client -o yaml | kubectl apply -f -
+              kubectl create -n {{ .Release.Namespace }} secret generic "headscale-noise-private-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --dry-run=client -o yaml | kubectl apply -f -
           volumeMounts:
             - name: headscale-configs
               mountPath: /etc/headscale
@@ -81,15 +81,52 @@ spec:
             - |
               export DSN=postgres://{{ $.Values.postgres.hs.username }}:{{ $.Values.postgres.hs.password }}@{{ $.Values.postgres.hs.hostname }}:{{ $.Values.postgres.hs.port }}?sslmode=disable
               psql $DSN -c "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
+        - name: headscale-create-auth
+          command: ["sh", "-c"]
+          args:
+            - |-
+              until headscale configtest; do
+                echo "wait 'headscale configtest'"
+                sleep 5
+              done
+              headscale serve &
+              until nc -zv 0.0.0.0:8080; do
+                sleep 2
+              done
+              headscale users create {{ .Release.Name }}
+              token=`headscale preauthkeys create --user {{ .Release.Name }} --reusable  --expiration 100y`
+              echo -e "name=tailscale,joinKey=$token,controlServerURL=http://headscale.{{ $.Values.domain }}" > /tmp/headscale_auth_file
+          image: headscale/headscale:stable-debug
+          volumeMounts:
+            - name: headscale-configs
+              mountPath: /etc/headscale
+            - name: tmp-storage
+              mountPath: /tmp
+            - name: headscale-noise-private
+              mountPath: /etc/headscale_secret
+        - name: create-secret-auth-file
+          image: bitnami/kubectl:latest
+          command: ["sh", "-c"]
+          args:
+            - |
+              kubectl create -n {{ .Release.Namespace }} secret generic "headscale-auth-file-{{ include "k3s-server.fullname" . }}" --from-file=headscale_auth_file=/tmp/headscale_auth_file --dry-run=client -o yaml | kubectl apply -f -
+          volumeMounts:
+            - name: headscale-configs
+              mountPath: /etc/headscale
+            - name: tmp-storage
+              mountPath: /tmp
       volumes:
         - name: tmp-storage
           emptyDir: {}
         - name: headscale-configs
           configMap:
             name: "headscale-{{ include "k3s-server.fullname" . }}"
-        - name: headscale-configs-source
+        - name: headscale-noise-private
           secret:
-            secretName: "headscale-{{ include "k3s-server.fullname" . }}"
+            secretName: "headscale-noise-private-{{ include "k3s-server.fullname" . }}"
+        - name: headscale-auth-file
+          secret:
+            secretName: "headscale-auth-file-{{ include "k3s-server.fullname" . }}"
       restartPolicy: OnFailure
       serviceAccount: "headscale-{{ include "k3s-server.fullname" . }}"
       serviceAccountName: "headscale-{{ include "k3s-server.fullname" . }}"
