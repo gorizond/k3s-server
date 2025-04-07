@@ -53,6 +53,8 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
+            - name: PATH
+              value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/bin/aux:/tailscale-binary"
             - name: K3S_DATASTORE_ENDPOINT
               value: postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
             - name: K3S_TOKEN
@@ -82,8 +84,10 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
           volumeMounts:
+            - mountPath: /tailscale-binary
+              name: tailscale-binary
+          {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
       initContainers:
@@ -104,7 +108,19 @@ spec:
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        - args:
+            - '-c'
+            - cp /usr/local/bin/tailscale /tailscale-binary/tailscale
+          command:
+            - sh
+          image: tailscale/tailscale
+          name: tailscale-binary
+          volumeMounts:
+            - mountPath: /tailscale-binary
+              name: tailscale-binary
       volumes:
+        - emptyDir: {}
+          name: tailscale-binary
         - name: headscale-configs
           configMap:
             name: "headscale-{{ include "k3s-server.fullname" . }}"
