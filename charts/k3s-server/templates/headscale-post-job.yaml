@@ -54,6 +54,7 @@ spec:
       containers:
         - name: generate-key
           image: headscale/headscale:stable-debug
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
           args:
             - |-
@@ -65,6 +66,7 @@ spec:
               mountPath: /etc/headscale
         - name: create-secret-noise-private
           image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
           args:
             - |
@@ -80,6 +82,7 @@ spec:
               mountPath: /tmp
         - name: create-database
           image: postgres:alpine
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
           args:
             - |
@@ -100,6 +103,7 @@ spec:
               headscale users create {{ .Release.Name }}
               token=`headscale preauthkeys create --user {{ .Release.Name }} --reusable  --expiration 100y`
               echo -e "name=tailscale,joinKey=$token,controlServerURL=http://headscale.{{ $.Values.domain }}" > /tmp/headscale_auth_file
+              echo -e "$token" > /tmp/token
           image: headscale/headscale:stable-debug
           volumeMounts:
             - name: headscale-configs
@@ -110,6 +114,7 @@ spec:
               mountPath: /etc/headscale_secret
         - name: create-secret-auth-file
           image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
           args:
             - |
@@ -117,7 +122,12 @@ spec:
                 echo "wait /tmp/headscale_auth_file"
                 sleep 2
               done
+              until [ -f /tmp/token ]; do
+                echo "wait /tmp/token"
+                sleep 2
+              done
               kubectl create -n {{ .Release.Namespace }} secret generic "headscale-auth-file-{{ include "k3s-server.fullname" . }}" --from-file=headscale_auth_file=/tmp/headscale_auth_file --dry-run=client -o yaml | kubectl apply -f -
+              kubectl create -n {{ .Release.Namespace }} secret generic "token-{{ include "k3s-server.fullname" . }}" --from-file=token=/tmp/token --dry-run=client -o yaml | kubectl apply -f -
           volumeMounts:
             - name: headscale-configs
               mountPath: /etc/headscale
@@ -135,6 +145,9 @@ spec:
         - name: headscale-auth-file
           secret:
             secretName: "headscale-auth-file-{{ include "k3s-server.fullname" . }}"
+        - name: token
+          secret:
+            secretName: "token-{{ include "k3s-server.fullname" . }}"
       restartPolicy: OnFailure
       serviceAccount: "headscale-{{ include "k3s-server.fullname" . }}"
       serviceAccountName: "headscale-{{ include "k3s-server.fullname" . }}"

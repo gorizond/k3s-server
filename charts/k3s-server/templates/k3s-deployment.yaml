@@ -82,7 +82,10 @@ spec:
             - name: K3S_DATASTORE_ENDPOINT
               value: postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
             - name: K3S_TOKEN
-              value: {{ $.Values.token }}
+              valueFrom:
+                secretKeyRef:
+                  key: token
+                  name: "token-{{ include "k3s-server.fullname" . }}"
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}

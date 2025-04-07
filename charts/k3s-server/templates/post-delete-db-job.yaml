@@ -16,6 +16,7 @@ spec:
       containers:
         - name: drop-database
           image: postgres:alpine
+          imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
           args:
             - |
