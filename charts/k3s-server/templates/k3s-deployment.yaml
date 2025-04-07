@@ -135,6 +135,18 @@ spec:
           volumeMounts:
             - mountPath: /tailscale-binary
               name: tailscale-binary
+        - args:
+            - |
+              until grep -q "joinKey" /var/run/headscale/headscale_auth_file 2>/dev/null; do
+                echo "wait /var/run/headscale/headscale_auth_file"
+                sleep 2
+              done
+          command: ["sh", "-c"]
+          image: tailscale/tailscale
+          name: check-headscale-auth-file
+          volumeMounts:
+            - mountPath: /var/run/headscale
+              name: headscale-secret
       volumes:
         - name: headscale-secret
           secret:
