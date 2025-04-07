@@ -117,10 +117,6 @@ spec:
                 echo "wait /tmp/headscale_auth_file"
                 sleep 2
               done
-              until nc -zv headscale-{{ include "k3s-server.fullname" . }}:8080; do
-                echo "wait headscale service is up"
-                sleep 2
-              done
               kubectl create -n {{ .Release.Namespace }} secret generic "headscale-auth-file-{{ include "k3s-server.fullname" . }}" --from-file=headscale_auth_file=/tmp/headscale_auth_file --dry-run=client -o yaml | kubectl apply -f -
           volumeMounts:
             - name: headscale-configs

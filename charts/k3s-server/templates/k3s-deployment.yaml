@@ -141,6 +141,10 @@ spec:
                 echo "wait /var/run/headscale/headscale_auth_file"
                 sleep 2
               done
+              until nc -zv headscale-{{ include "k3s-server.fullname" . }}:8080; do
+                echo "wait headscale service is up"
+                sleep 2
+              done
           command: ["sh", "-c"]
           image: tailscale/tailscale
           name: check-headscale-auth-file
