@@ -68,6 +68,10 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
+              until [ -f /tmp/noise_private.key ]; do
+                echo "wait /tmp/noise_private.key"
+                sleep 2
+              done
               kubectl create -n {{ .Release.Namespace }} secret generic "headscale-noise-private-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --dry-run=client -o yaml | kubectl apply -f -
           volumeMounts:
             - name: headscale-configs
@@ -109,6 +113,10 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
+              until [ -f /tmp/headscale_auth_file ]; do
+                echo "wait /tmp/headscale_auth_file"
+                sleep 2
+              done
               kubectl create -n {{ .Release.Namespace }} secret generic "headscale-auth-file-{{ include "k3s-server.fullname" . }}" --from-file=headscale_auth_file=/tmp/headscale_auth_file --dry-run=client -o yaml | kubectl apply -f -
           volumeMounts:
             - name: headscale-configs
