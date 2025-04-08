@@ -72,6 +72,7 @@ spec:
             - '--disable=traefik'
             - '--disable=local-storage'
             - '--disable=metrics-server'
+            - '--token=$(IMPORT_K3S_AGENT_TOKEN)'
             - '--vpn-auth-file=/var/run/headscale/headscale_auth_file'
           {{- with .Values.args }}
             {{- toYaml . | nindent 12 }}
@@ -81,7 +82,7 @@ spec:
               value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/bin/aux:/tailscale-binary"
             - name: K3S_DATASTORE_ENDPOINT
               value: postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
-            - name: K3S_AGENT_TOKEN
+            - name: IMPORT_K3S_AGENT_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: token
