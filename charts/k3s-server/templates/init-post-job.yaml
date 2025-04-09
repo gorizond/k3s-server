@@ -114,14 +114,22 @@ spec:
               mountPath: /etc/headscale
             - name: tmp-storage
               mountPath: /tmp
-        - name: create-database
+        - name: create-database-hs
           image: postgres:alpine
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
           args:
             - |
               export DSN=postgres://{{ $.Values.postgres.hs.username }}:{{ $.Values.postgres.hs.password }}@{{ $.Values.postgres.hs.hostname }}:{{ $.Values.postgres.hs.port }}?sslmode=disable
-              psql $DSN -c "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};" || echo "db problem"
+              psql $DSN -c "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
+        - name: create-database-k3s
+          image: postgres:alpine
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - |
+              export DSN=postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}?sslmode=disable
+              psql $DSN -c "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
         - name: headscale-create-auth
           command: ["sh", "-c"]
           args:
