@@ -1,25 +1,30 @@
 # Default values for k3s-server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+global:
+  domain: 123
 domain: ""
 k3s:
   database:
-    type: postgres
     image: postgres:alpine
-    cli: psql
     username: postgres
     password: passw0rd
     hostname: postgres
     port: 5432
     query: sslmode=disable
+    # K3S_DB_* import
+    connectionCli: psql "postgres://$K3S_DB_USERNAME:$K3S_DB_PASSWORD@$K3S_DB_HOSTNAME:$K3S_DB_PORT?$K3S_DB_QUERY" -c
+
 hs:
   database:
-    type: postgres
+    image: postgres:alpine
     username: postgres
     password: passw0rd
     hostname: postgres
     port: 5432
     query: sslmode=disable
+    # K3S_DB_* import
+    connectionCli: psql "postgres://$K3S_DB_USERNAME:$K3S_DB_PASSWORD@$K3S_DB_HOSTNAME:$K3S_DB_PORT?$K3S_DB_QUERY" -c
 token: t0ken
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1

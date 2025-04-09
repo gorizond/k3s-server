@@ -115,21 +115,45 @@ spec:
             - name: tmp-storage
               mountPath: /tmp
         - name: create-database-hs
-          image: postgres:alpine
+          image: {{ $.Values.hs.database.image }}
           imagePullPolicy: IfNotPresent
+          env:
+            - name: HS_DB_USERNAME
+              value: {{ .Values.hs.database.username }}
+            - name: HS_DB_PASSWORD
+              value: {{ .Values.hs.database.password }}
+            - name: HS_DB_HOSTNAME
+              value: {{ .Values.hs.database.hostname }}
+            - name: HS_DB_PORT
+              value: {{ .Values.hs.database.port }}
+            - name: HS_DB_QUERY
+              value: {{ .Values.hs.database.query }}
+            - name: HS_DB_NAME
+              value: {{ include "k3s-server.sanitizeNameHeadscale" . }}
           command: ["sh", "-c"]
           args:
             - |
-              export DSN='{{ $.Values.hs.database.type }}://{{ $.Values.hs.database.username }}:{{ $.Values.hs.database.password }}@{{ $.Values.hs.database.hostname }}:{{ $.Values.hs.database.port }}?{{ $.Values.hs.database.query }}'
-              psql $DSN -c "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
+              {{ .Values.k3s.database.connectionCli }} "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
         - name: create-database-k3s
           image: {{ $.Values.k3s.database.image }}
           imagePullPolicy: IfNotPresent
+          env:
+            - name: K3S_DB_USERNAME
+              value: {{ .Values.k3s.database.username }}
+            - name: K3S_DB_PASSWORD
+              value: {{ .Values.k3s.database.password }}
+            - name: K3S_DB_HOSTNAME
+              value: {{ .Values.k3s.database.hostname }}
+            - name: K3S_DB_PORT
+              value: {{ .Values.k3s.database.port }}
+            - name: K3S_DB_QUERY
+              value: {{ .Values.k3s.database.query }}
+            - name: K3S_DB_NAME
+              value: {{ include "k3s-server.sanitizeName" . }}
           command: ["sh", "-c"]
           args:
             - |
-              export DSN='{{ $.Values.k3s.database.type }}://{{ $.Values.k3s.database.username }}:{{ $.Values.k3s.database.password }}@{{ $.Values.k3s.database.hostname }}:{{ $.Values.k3s.database.port }}?{{ $.Values.hs.database.query }}'
-              {{ $.Values.k3s.database.cli }} $DSN -c "CREATE DATABASE {{ include "k3s-server.sanitizeName" . }};"
+              {{ .Values.k3s.database.connectionCli }} "CREATE DATABASE {{ include "k3s-server.sanitizeName" . }};"
         - name: headscale-create-auth
           command: ["sh", "-c"]
           args:
