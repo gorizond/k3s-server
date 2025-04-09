@@ -1,8 +1,6 @@
 # Default values for k3s-server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-global:
-  domain: 123
 domain: ""
 k3s:
   database:

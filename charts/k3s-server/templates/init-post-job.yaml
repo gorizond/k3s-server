@@ -119,17 +119,17 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: HS_DB_USERNAME
-              value: {{ .Values.hs.database.username }}
+              value: "{{ .Values.hs.database.username }}"
             - name: HS_DB_PASSWORD
-              value: {{ .Values.hs.database.password }}
+              value: "{{ .Values.hs.database.password }}"
             - name: HS_DB_HOSTNAME
-              value: {{ .Values.hs.database.hostname }}
+              value: "{{ .Values.hs.database.hostname }}"
             - name: HS_DB_PORT
-              value: {{ .Values.hs.database.port }}
+              value: "{{ .Values.hs.database.port }}"
             - name: HS_DB_QUERY
-              value: {{ .Values.hs.database.query }}
+              value: "{{ .Values.hs.database.query }}"
             - name: HS_DB_NAME
-              value: {{ include "k3s-server.sanitizeNameHeadscale" . }}
+              value: "{{ include \"k3s-server.sanitizeNameHeadscale\" . }}"
           command: ["sh", "-c"]
           args:
             - |
@@ -139,17 +139,17 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: K3S_DB_USERNAME
-              value: {{ .Values.k3s.database.username }}
+              value: "{{ .Values.k3s.database.username }}"
             - name: K3S_DB_PASSWORD
-              value: {{ .Values.k3s.database.password }}
+              value: "{{ .Values.k3s.database.password }}"
             - name: K3S_DB_HOSTNAME
-              value: {{ .Values.k3s.database.hostname }}
+              value: "{{ .Values.k3s.database.hostname }}"
             - name: K3S_DB_PORT
-              value: {{ .Values.k3s.database.port }}
+              value: "{{ .Values.k3s.database.port }}"
             - name: K3S_DB_QUERY
-              value: {{ .Values.k3s.database.query }}
+              value: "{{ .Values.k3s.database.query }}"
             - name: K3S_DB_NAME
-              value: {{ include "k3s-server.sanitizeName" . }}
+              value: "{{ include \"k3s-server.sanitizeName\" . }}"
           command: ["sh", "-c"]
           args:
             - |
