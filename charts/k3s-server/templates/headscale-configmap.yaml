@@ -34,7 +34,7 @@ data:
         parameterized_queries: true
         skip_err_record_not_found: true
         slow_threshold: 1000
-      {{ $.Values.hs.database.type }}:
+      postgres:
         host: "{{ $.Values.hs.database.hostname }}"
         port: "{{ $.Values.hs.database.port }}"
         name: "{{ include "k3s-server.sanitizeNameHeadscale" . }}"
