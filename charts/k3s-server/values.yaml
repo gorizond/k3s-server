@@ -2,17 +2,22 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 domain: ""
-postgres:
-  k3s:
+k3s:
+  database:
+    type: postgres
     username: postgres
     password: passw0rd
     hostname: postgres
     port: 5432
-  hs:
+    query: sslmode=disable
+hs:
+  database:
+    type: postgres
     username: postgres
     password: passw0rd
     hostname: postgres
     port: 5432
+    query: sslmode=disable
 token: t0ken
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1

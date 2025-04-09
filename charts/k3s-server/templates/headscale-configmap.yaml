@@ -34,12 +34,12 @@ data:
         parameterized_queries: true
         skip_err_record_not_found: true
         slow_threshold: 1000
-      postgres:
-        host: "{{ $.Values.postgres.hs.hostname }}"
-        port: "{{ $.Values.postgres.hs.port }}"
+      {{ $.Values.hs.database.type }}:
+        host: "{{ $.Values.hs.database.hostname }}"
+        port: "{{ $.Values.hs.database.port }}"
         name: "{{ include "k3s-server.sanitizeNameHeadscale" . }}"
-        user: "{{ $.Values.postgres.hs.username }}"
-        pass: "{{ $.Values.postgres.hs.password }}"
+        user: "{{ $.Values.hs.database.username }}"
+        pass: "{{ $.Values.hs.database.password }}"
         max_open_conns: 10
         max_idle_conns: 10
         conn_max_idle_time_secs: 3600

@@ -20,7 +20,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              export DSN=postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}?sslmode=disable
+              export DSN={{ $.Values.k3s.database.type }}://{{ $.Values.k3s.database.username }}:{{ $.Values.k3s.database.password }}@{{ $.Values.k3s.database.hostname }}:{{ $.Values.k3s.database.port }}?{{ $.Values.k3s.database.query }}
               psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.sanitizeName" . }};"
         - name: drop-database-hs
           image: postgres:alpine
@@ -28,7 +28,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              export DSN=postgres://{{ $.Values.postgres.hs.username }}:{{ $.Values.postgres.hs.password }}@{{ $.Values.postgres.hs.hostname }}:{{ $.Values.postgres.hs.port }}?sslmode=disable
+              export DSN={{ $.Values.hs.database.type }}://{{ $.Values.hs.database.username }}:{{ $.Values.hs.database.password }}@{{ $.Values.hs.database.hostname }}:{{ $.Values.hs.database.port }}?{{ $.Values.hs.database.query }}
               psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.sanitizeNameHeadscale" . }};"
       restartPolicy: Never
       serviceAccount: default

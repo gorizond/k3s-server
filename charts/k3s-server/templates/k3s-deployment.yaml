@@ -80,7 +80,7 @@ spec:
             - name: PATH
               value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/bin/aux:/tailscale-binary"
             - name: K3S_DATASTORE_ENDPOINT
-              value: postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}/{{ include "k3s-server.sanitizeName" . }}?sslmode=disable
+              value: {{ $.Values.k3s.database.type }}://{{ $.Values.k3s.database.username }}:{{ $.Values.k3s.database.password }}@{{ $.Values.k3s.database.hostname }}:{{ $.Values.k3s.database.port }}/{{ include "k3s-server.sanitizeName" . }}?{{ $.Values.k3s.database.query }}
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
