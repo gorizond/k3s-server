@@ -5,6 +5,7 @@ domain: ""
 k3s:
   database:
     image: postgres:alpine
+    type: postgres
     username: postgres
     password: passw0rd
     hostname: postgres
