@@ -129,11 +129,11 @@ spec:
             - name: HS_DB_QUERY
               value: "{{ .Values.hs.database.query }}"
             - name: HS_DB_NAME
-              value: {{ include "k3s-server.sanitizeNameHeadscale" . }}"]
+              value: {{ include "k3s-server.sanitizeNameHeadscale" . }}
           command: ["sh", "-c"]
           args:
             - |
-              {{ .Values.k3s.database.connectionCli }} "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
+              {{ .Values.hs.database.connectionCli }} "CREATE DATABASE {{ include "k3s-server.sanitizeNameHeadscale" . }};"
         - name: create-database-k3s
           image: {{ $.Values.k3s.database.image }}
           imagePullPolicy: IfNotPresent
