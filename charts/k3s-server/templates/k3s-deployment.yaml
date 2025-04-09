@@ -85,7 +85,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: token
-                  name: "token-{{ include "k3s-server.fullname" . }}"
+                  name: "headscale-token-{{ include "k3s-server.fullname" . }}"
           {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
