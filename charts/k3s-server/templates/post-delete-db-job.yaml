@@ -53,7 +53,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              {{ .Values.k3s.database.connectionCli }} "DROP DATABASE IF EXISTS $HS_DB_NAME;"
+              {{ .Values.hs.database.connectionCli }} "DROP DATABASE IF EXISTS $HS_DB_NAME;"
       restartPolicy: Never
       serviceAccount: default
       serviceAccountName: default
