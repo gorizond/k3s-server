@@ -22,7 +22,7 @@ hs:
     port: 5432
     query: sslmode=disable
     # K3S_DB_* import
-    connectionCli: psql "postgres://$K3S_DB_USERNAME:$K3S_DB_PASSWORD@$K3S_DB_HOSTNAME:$K3S_DB_PORT?$K3S_DB_QUERY" -c
+    connectionCli: psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT?$HS_DB_QUERY" -c
 token: t0ken
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
