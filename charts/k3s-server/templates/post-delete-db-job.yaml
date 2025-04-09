@@ -14,7 +14,7 @@ spec:
         {{- include "k3s-server.labels" . | nindent 8 }}
     spec:
       containers:
-        - name: drop-database
+        - name: drop-database-k3s
           image: postgres:alpine
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
@@ -22,6 +22,12 @@ spec:
             - |
               export DSN=postgres://{{ $.Values.postgres.k3s.username }}:{{ $.Values.postgres.k3s.password }}@{{ $.Values.postgres.k3s.hostname }}:{{ $.Values.postgres.k3s.port }}?sslmode=disable
               psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.sanitizeName" . }};"
+        - name: drop-database-hs
+          image: postgres:alpine
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - |
               export DSN=postgres://{{ $.Values.postgres.hs.username }}:{{ $.Values.postgres.hs.password }}@{{ $.Values.postgres.hs.hostname }}:{{ $.Values.postgres.hs.port }}?sslmode=disable
               psql $DSN -c "DROP DATABASE IF EXISTS {{ include "k3s-server.sanitizeNameHeadscale" . }};"
       restartPolicy: Never
