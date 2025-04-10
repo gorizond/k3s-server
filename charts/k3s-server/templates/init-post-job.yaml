@@ -74,8 +74,6 @@ metadata:
 rules:
   - apiGroups:
       - management.cattle.io
-    resourceNames:
-      - {{ .Values.clusterId }}
     resources:
       - clusterregistrationtokens
     verbs:
@@ -125,7 +123,7 @@ spec:
               mountPath: /tmp
             - name: headscale-configs
               mountPath: /etc/headscale
-        - name: create-secret-noise-private-and-k3s
+        - name: create-secret-noise-private-k3s-and-rancher-agent
           image: bitnami/kubectl:latest
           imagePullPolicy: IfNotPresent
           command: ["sh", "-c"]
@@ -135,11 +133,17 @@ spec:
                 echo "wait /tmp/noise_private.key"
                 sleep 2
               done
+              # create headscale connetction file
               kubectl create -n {{ .Release.Namespace }} secret generic "headscale-noise-private-{{ include "k3s-server.fullname" . }}" --from-file=noise_private.key=/tmp/noise_private.key --dry-run=client -o yaml | kubectl apply -f -
               kubectl rollout status deployment/{{ include "k3s-server.fullname" . }}
               sleep 5
+              # create join token
               kubectl exec -it -n {{ .Release.Namespace }} deploy/{{ include "k3s-server.fullname" . }} -c k3s -- k3s token create --ttl 0 > /tmp/k3s-token
               kubectl create -n {{ .Release.Namespace }} secret generic "k3s-token-{{ include "k3s-server.fullname" . }}" --from-file=token=/tmp/k3s-token --dry-run=client -o yaml | kubectl apply -f -
+              # install rancher agent to cluster
+              command=`kubectl get clusterregistrationtoken.management.cattle.io -n {{ .Values.clusterId }} default-token -o jsonpath='{.status.command}'`
+              echo $command
+              kubectl exec -it -n {{ .Release.Namespace }} deploy/{{ include "k3s-server.fullname" . }} -c k3s -- k3s "$command"
           volumeMounts:
             - name: headscale-configs
               mountPath: /etc/headscale
