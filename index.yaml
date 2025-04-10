@@ -3,6 +3,16 @@ entries:
   k3s-server:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-04-10T20:44:41.077213003Z"
+    description: A Helm chart for Kubernetes
+    digest: 68f9bc8e1ed5da6484e908ce3c8e7a924d30d18d1893b3dbd4dca31ec4a0a850
+    name: k3s-server
+    type: application
+    urls:
+    - https://github.com/gorizond/k3s-server/releases/download/k3s-server-0.1.74/k3s-server-0.1.74.tgz
+    version: 0.1.74
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2025-04-10T20:30:12.838531766Z"
     description: A Helm chart for Kubernetes
     digest: 5afcb35b0974f9982448a6e7d3c048e5b8117984d7ce07a91395379c6d1beeab
@@ -731,4 +741,4 @@ entries:
     urls:
     - https://github.com/gorizond/k3s-server/releases/download/k3s-server-0.1.0/k3s-server-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-10T20:30:12.838871168Z"
+generated: "2025-04-10T20:44:41.077539523Z"
