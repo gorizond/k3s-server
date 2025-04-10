@@ -65,6 +65,37 @@ subjects:
     name: "init-{{ include "k3s-server.fullname" . }}"
     namespace: {{ .Release.Namespace }}
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gorizond-{{ include "k3s-server.fullname" . }}-role
+  labels:
+    {{- include "k3s-server.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - management.cattle.io
+    resourceNames:
+      - {{ .Values.clusterId }}
+    resources:
+      - clusterregistrationtokens
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gorizond-{{ include "k3s-server.fullname" . }}-rolebinding
+  labels:
+    {{- include "k3s-server.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "k3s-server.fullname" . }}-role
+subjects:
+  - kind: ServiceAccount
+    name: "init-{{ include "k3s-server.fullname" . }}"
+    namespace: {{ .Release.Namespace }}
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
