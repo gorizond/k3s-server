@@ -143,7 +143,7 @@ spec:
               # install rancher agent to cluster
               command=`kubectl get clusterregistrationtoken.management.cattle.io -n {{ .Values.clusterId }} default-token -o jsonpath='{.status.command}'`
               echo $command
-              kubectl exec -it -n {{ .Release.Namespace }} deploy/{{ include "k3s-server.fullname" . }} -c k3s -- k3s $command
+              kubectl exec -it -n {{ .Release.Namespace }} deploy/{{ include "k3s-server.fullname" . }} -c k3s --   $command
           volumeMounts:
             - name: headscale-configs
               mountPath: /etc/headscale
