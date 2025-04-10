@@ -35,8 +35,8 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ($HS_DB_NAME);"
-              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ($K3S_DB_NAME);"
+              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ('$HS_DB_NAME');"
+              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ('$K3S_DB_NAME');"
       restartPolicy: Never
       serviceAccount: default
       serviceAccountName: default
