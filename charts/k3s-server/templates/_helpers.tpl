@@ -10,8 +10,8 @@ Database name api
 */}}
 {{- define "k3s-server.sanitizeName" -}}
 {{- $namespace := .Release.Namespace -}}
-{{- $fullname := .Release.Name -}}
-{{- $combined := printf "%s_api_%s" $namespace $fullname -}}
+{{- $clusterId := .Values.clusterId -}}
+{{- $combined := printf "%s_api_%s" $namespace $clusterId -}}
 {{- $sanitized := $combined -}}
 {{- $sanitized = $sanitized | replace "@" "_" | replace "." "_" | replace "-" "_" | replace "_" "_" | replace ":" "_" | replace " " "_" -}}
 {{- $sanitized -}}
@@ -22,8 +22,8 @@ Database name headscale
 */}}
 {{- define "k3s-server.sanitizeNameHeadscale" -}}
 {{- $namespace := .Release.Namespace -}}
-{{- $fullname := .Release.Name -}}
-{{- $combined := printf "%s_hs_%s" $namespace $fullname -}}
+{{- $clusterId := .Values.clusterId -}}
+{{- $combined := printf "%s_hs_%s" $namespace $clusterId -}}
 {{- $sanitized := $combined -}}
 {{- $sanitized = $sanitized | replace "@" "_" | replace "." "_" | replace "-" "_" | replace "_" "_" | replace ":" "_" | replace " " "_" -}}
 {{- $sanitized -}}
