@@ -33,7 +33,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              {{ .Values.k3s.database.connectionCli }} "DROP DATABASE IF EXISTS $K3S_DB_NAME;"
+              {{ .Values.hs.database.connectionCli }} "INSERT INTO gorizond_truncate.table_to_delete (id) VALUES ($HS_DB_NAME);"
         - name: drop-database-hs
           image: {{ .Values.hs.database.image }}
           imagePullPolicy: IfNotPresent
@@ -53,7 +53,7 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              {{ .Values.hs.database.connectionCli }} "DROP DATABASE IF EXISTS $HS_DB_NAME;"
+              {{ .Values.hs.database.connectionCli }} "INSERT INTO gorizond_truncate.table_to_delete (id) VALUES ($HS_DB_NAME);"
       restartPolicy: Never
       serviceAccount: default
       serviceAccountName: default
