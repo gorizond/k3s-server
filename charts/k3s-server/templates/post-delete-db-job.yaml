@@ -14,7 +14,7 @@ spec:
         {{- include "k3s-server.labels" . | nindent 8 }}
     spec:
       containers:
-        - name: drop-databases
+        - name: drop-database-hs
           image: {{ .Values.hs.database.image }}
           imagePullPolicy: IfNotPresent
           env:
@@ -30,13 +30,30 @@ spec:
               value: "{{ .Values.hs.database.query }}"
             - name: HS_DB_NAME
               value: {{ include "k3s-server.sanitizeNameHeadscale" . }}
+          command: ["sh", "-c"]
+          args:
+            - |
+              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ('$HS_DB_NAME');"
+        - name: drop-database-k3s
+          image: {{ .Values.k3s.database.image }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: K3S_DB_USERNAME
+              value: "{{ .Values.k3s.database.username }}"
+            - name: K3S_DB_PASSWORD
+              value: "{{ .Values.k3s.database.password }}"
+            - name: K3S_DB_HOSTNAME
+              value: "{{ .Values.k3s.database.hostname }}"
+            - name: K3S_DB_PORT
+              value: "{{ .Values.k3s.database.port }}"
+            - name: K3S_DB_QUERY
+              value: "{{ .Values.k3s.database.query }}"
             - name: K3S_DB_NAME
               value: {{ include "k3s-server.sanitizeName" . }}
           command: ["sh", "-c"]
           args:
             - |
-              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ('$HS_DB_NAME');"
-              psql "postgres://$HS_DB_USERNAME:$HS_DB_PASSWORD@$HS_DB_HOSTNAME:$HS_DB_PORT/gorizond_truncate?$HS_DB_QUERY" -c "INSERT INTO table_to_delete (id) VALUES ('$K3S_DB_NAME');"
+              {{ .Values.k3s.database.connectionCli }} "DROP DATABASE IF EXISTS $K3S_DB_NAME;"
       restartPolicy: Never
       serviceAccount: default
       serviceAccountName: default
